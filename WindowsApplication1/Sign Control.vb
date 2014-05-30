@@ -427,18 +427,18 @@ Public Class Sign_Control
             Return "FULL"
         End If
         Count = Strings.Trim(strCount)
-        Select Case Strings.Len(strCount)
-            Case 0
-                Return "    "
-            Case 1
-                Return ("   " & Strings.Trim(Convert.ToString(strCount)))
-            Case 2
-                Return ("  " & Strings.Trim(Convert.ToString(strCount)))
-            Case 3
-                Return (" " & Strings.Trim(Convert.ToString(strCount)))
-            Case 4
-                Return Strings.Trim(Convert.ToString(strCount))
-        End Select
+        'Select Case Strings.Len(strCount)
+        '    Case 0
+        '        Return "    "
+        '    Case 1
+        '        Return ("   " & Strings.Trim(Convert.ToString(strCount)))
+        '    Case 2
+        '        Return ("  " & Strings.Trim(Convert.ToString(strCount)))
+        '    Case 3
+        '        Return (" " & Strings.Trim(Convert.ToString(strCount)))
+        '    Case 4
+        '        Return Strings.Trim(Convert.ToString(strCount))
+        'End Select
 
         Return Strings.Right(Strings.Trim(Convert.ToString(strCount)), 4)
 
@@ -471,18 +471,18 @@ Public Class Sign_Control
                     signvalue = sign
                     Try
                         Me.Invoke(New MethodInvoker(Sub() Communications(signarray(signvalue))))
-                        Dim signconfig As New IniFile
-                        signconfig.Load("C:\test.ini")
+                        'Dim signconfig As New IniFile
+                        'signconfig.Load("C:\test.ini")
                         'Untested Line
-                        For Each key As IniFile.IniSection.IniKey In signconfig.GetSection(sign).Keys
+                        Diffs.Load("C:\test.ini")
+                        For Each key As IniFile.IniSection.IniKey In Diffs.GetSection(signarray(signvalue)).Keys
                             If key.Name = "ComPort" Then
-                                COMSign_Send(signconfig.GetSection(sign).GetKey("ComPort").GetValue, UpdateCounts(sign))
+                                COMSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("ComPort").GetValue, UpdateCounts(signarray(signvalue)))
                             ElseIf key.Name = "IP Address" Then
 
                             End If
                         Next
                     Catch ex As Exception
-
                     End Try
                 Next sign
                 'Next
