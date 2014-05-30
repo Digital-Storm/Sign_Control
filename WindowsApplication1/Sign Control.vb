@@ -5,7 +5,7 @@ Imports System.Drawing
 Imports System.IO.Ports
 Imports System.Windows.Forms
 Imports System.Threading
-Imports V15NetLib
+'Imports V15NetLib
 Imports System.ComponentModel
 
 
@@ -381,21 +381,21 @@ Public Class Sign_Control
 
     ' Dimming Settings
 
-    Public Sub DimmingAutoSign(SignIP As String)
+    'Public Sub DimmingAutoSign(SignIP As String)
 
-        Me.SignError = Me.SignNet.MdcSetDimming(SignIP, DimmingType.DIMMING_AUTO, 0)
-        'Me.lstDebug.Items.Insert(0, (Convert.ToString(DateAndTime.Now) & " [S1 Dimming->Auto]->" & DataTypes.GetV15Error(Me.SignError)))
-    End Sub
+    '    Me.SignError = Me.SignNet.MdcSetDimming(SignIP, DimmingType.DIMMING_AUTO, 0)
+    '    'Me.lstDebug.Items.Insert(0, (Convert.ToString(DateAndTime.Now) & " [S1 Dimming->Auto]->" & DataTypes.GetV15Error(Me.SignError)))
+    'End Sub
 
-    Public Sub DimmingMaximumSign(SignIP As String)
-        Me.SignError = Me.SignNet.MdcSetDimming(SignIP, DimmingType.DIMMING_MANUAL, &H3F)
-        'Me.lstDebug.Items.Insert(0, (Convert.ToString(DateAndTime.Now) & " [S1 Dimming->Maximum]->" & DataTypes.GetV15Error(Me.SignError)))
-    End Sub
+    'Public Sub DimmingMaximumSign(SignIP As String)
+    '    Me.SignError = Me.SignNet.MdcSetDimming(SignIP, DimmingType.DIMMING_MANUAL, &H3F)
+    '    'Me.lstDebug.Items.Insert(0, (Convert.ToString(DateAndTime.Now) & " [S1 Dimming->Maximum]->" & DataTypes.GetV15Error(Me.SignError)))
+    'End Sub
 
-    Public Sub DimmingMinimumSign(SignIP As String)
-        Me.SignError = Me.SignNet.MdcSetDimming(SignIP, DimmingType.DIMMING_MANUAL, 1)
-        'Me.lstDebug.Items.Insert(0, (Convert.ToString(DateAndTime.Now) & " [S1 Dimming->Minimum]->" & DataTypes.GetV15Error(Me.SignError)))
-    End Sub
+    'Public Sub DimmingMinimumSign(SignIP As String)
+    '    Me.SignError = Me.SignNet.MdcSetDimming(SignIP, DimmingType.DIMMING_MANUAL, 1)
+    '    'Me.lstDebug.Items.Insert(0, (Convert.ToString(DateAndTime.Now) & " [S1 Dimming->Minimum]->" & DataTypes.GetV15Error(Me.SignError)))
+    'End Sub
 
 
     Public Function UpdateCounts(ByVal Sign As String) As String
@@ -541,8 +541,8 @@ Public Class Sign_Control
     End Sub
 
     'Public Delegate Sub SetValue(value As Integer)
-    Private SignError As V15NetError
-    Private SignNet As V15NetworkClass
+    'Private SignError As V15NetError
+    'Private SignNet As V15NetworkClass
     Private INIFile As IniFile
 
     Private Sub StartCommunicationsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles StartCommunicationsToolStripMenuItem.Click

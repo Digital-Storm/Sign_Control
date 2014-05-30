@@ -16,8 +16,7 @@ Public Class Settings
         StartUpOption.Checked = My.Settings.RunOnStartup
         ExportToJSONOption.Checked = My.Settings.LogToJSON
         ExportToCSVOption.Checked = My.Settings.LogToCSV
-
-        Dim CurrentItem As ListViewItem
+        Dim CurrentItem As ListViewItem = New ListViewItem()
         For Each Item As String In My.Settings.DiffsFilePath
             If Not Item.StartsWith("SubItem:") Then
                 CurrentItem = New ListViewItem(Item)
