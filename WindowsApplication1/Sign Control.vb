@@ -347,9 +347,23 @@ Public Class Sign_Control
     End Sub
 
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    'Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub COMSign_Send(port As String, count As String)
+        If count.Length < 4 Then
+            Select Case count.Length
+                Case 0
+                    count = "0000"
+                Case 1
+                    count = "000" & count
+                Case 2
+                    count = "00" & count
+                Case 3
+                    count = "0" & count
+            End Select
+        End If
+
         Dim bytearray1() As Byte = {22, 22, 2, 3, 0, 0}
-        Dim bytearray2() As Byte = UnicodeStringToBytes(TextBox1.Text)
+        Dim bytearray2() As Byte = UnicodeStringToBytes(count)
         Dim bytearray3() As Byte = {2, 3}
 
         'Data Organization  
@@ -359,7 +373,7 @@ Public Class Sign_Control
         '(00) Normal Operation (02) Sign OPEN (03) Sign FULL
 
         Using SignCOM As IO.Ports.SerialPort =
-            My.Computer.Ports.OpenSerialPort("Com50")
+            My.Computer.Ports.OpenSerialPort(port)
             SignCOM.BaudRate = 9600
             SignCOM.DataBits = 8
             SignCOM.Parity = IO.Ports.Parity.None
@@ -457,6 +471,16 @@ Public Class Sign_Control
                     signvalue = sign
                     Try
                         Me.Invoke(New MethodInvoker(Sub() Communications(signarray(signvalue))))
+                        Dim signconfig As New IniFile
+                        signconfig.Load("C:\test.ini")
+                        'Untested Line
+                        For Each key As IniFile.IniSection.IniKey In signconfig.GetSection(sign).Keys
+                            If key.Name = "ComPort" Then
+                                COMSign_Send(signconfig.GetSection(sign).GetKey("ComPort").GetValue, UpdateCounts(sign))
+                            ElseIf key.Name = "IP Address" Then
+
+                            End If
+                        Next
                     Catch ex As Exception
 
                     End Try
@@ -489,7 +513,16 @@ Public Class Sign_Control
     End Sub
 
     Public Sub Communications(sign As String)
-        SignsListView.FindItemWithText(sign).SubItems(1).Text = UpdateCounts(sign)
+        Dim SignCount As New Integer
+        SignCount = UpdateCounts(sign)
+        SignsListView.FindItemWithText(sign).SubItems(1).Text = SignCount
+
+
+
+
+
+
+
         'For Each item As ListViewItem In SignsListView.Items
         '    If item.Text = sign Then
         '        item.SubItems.Item(1).Text = UpdateCounts(sign)
