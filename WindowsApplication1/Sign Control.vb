@@ -229,63 +229,81 @@ Public Class Sign_Control
 
     'Clears the SignList setting and refills it with the current Sign list items and settings.
     Private Sub SignSaveSettings(FocusedSign As ListViewItem, Optional ByVal NewSign As Boolean = False)
-        'My.Settings.SignList.Clear()
-        'Dim signcheck As Integer = 0
-        'For Each section As IniFile.IniSection In SignConfig.Sections
-        '    If section.Name = SignNameTextBox.Text Then
-        '        signcheck += 1
-        '    End If
-        'Next
+        Dim SignSection As IniFile.IniSection
+        SignSection = SignConfig.GetSection(FocusedSign.Text)
 
-        While SaveSignNames = False
-        End While
-        If ValidateSign(FocusedSign) = True Then
-            If FocusedSign.Group.Tag = 0 Then
-                'SignNameTextBox.ForeColor = Color.Black
+        If SignSection IsNot Nothing And ValidateSign(FocusedSign) = True Then
+            Select Case FocusedSign.Group.Tag
+                Case 0
+                    FocusedSign.Text = SignNameTextBox.Text
+                    SignConfig.AddSection(FocusedSign.Text)
+                    SignSection.RemoveAllKeys()
+                    SignSection.AddKey("CountKey").SetValue(CountKeyTextBox.Text)
+                    SignSection.AddKey("CountHeader").SetValue(CountHeaderTextBox.Text)
+                    SignSection.AddKey("ExportName").SetValue(ExportNameTextBox.Text)
+                    SignSection.AddKey("DisplayMode").SetValue(DisplayModeDropBox.Text)
+                    SignSection.AddKey("Diffs").SetValue(DiffsDropBox.Text)
+                    If IPSignRadio.Checked = True And COMSignRadio.Checked = False Then
+                        SignSection.AddKey("ConnectionType").SetValue("1")
+                        SignSection.AddKey("SignType").SetValue(SignTypeComboBox.Text)
+                        SignSection.AddKey("IPAddress").SetValue(IPAddressTextBox.Text)
+                        SignSection.AddKey("Port").SetValue(PortTextBox.Text)
+                        SignSection.AddKey("Brightness").SetValue(BrightnessDropBox.Text)
+                        SignSection.AddKey("Color").SetValue(ColorComboBox.Text)
+                    ElseIf IPSignRadio.Checked = False And COMSignRadio.Checked = True Then
+                        SignSection.AddKey("ConnectionType").SetValue("2")
+                        SignSection.AddKey("ComPort").SetValue(COMPortDropBox.Text)
+                    End If
+                Case Is <> 0
+                    SignConfig.RenameSection(LoadedSignName, SignNameTextBox.Text)
+                    FocusedSign.Text = SignNameTextBox.Text
+                    If SignSection.Keys.Count > 0 Then
+                        SignSection.RemoveAllKeys()
+                    End If
+                    SignSection.AddKey("CountKey").SetValue(CountKeyTextBox.Text)
+                    SignSection.AddKey("CountHeader").SetValue(CountHeaderTextBox.Text)
+                    SignSection.AddKey("ExportName").SetValue(ExportNameTextBox.Text)
+                    SignSection.AddKey("DisplayMode").SetValue(DisplayModeDropBox.Text)
+                    SignSection.AddKey("Diffs").SetValue(DiffsDropBox.Text)
+                    If IPSignRadio.Checked = True And COMSignRadio.Checked = False Then
+                        SignSection.AddKey("ConnectionType").SetValue("1")
+                        SignSection.AddKey("SignType").SetValue(SignTypeComboBox.Text)
+                        SignSection.AddKey("IPAddress").SetValue(IPAddressTextBox.Text)
+                        SignSection.AddKey("Port").SetValue(PortTextBox.Text)
+                        SignSection.AddKey("Brightness").SetValue(BrightnessDropBox.Text)
+                        SignSection.AddKey("Color").SetValue(ColorComboBox.Text)
+                    ElseIf IPSignRadio.Checked = False And COMSignRadio.Checked = True Then
+                        SignSection.AddKey("ConnectionType").SetValue("2")
+                        SignSection.AddKey("ComPort").SetValue(COMPortDropBox.Text)
+                    End If
+            End Select
+        ElseIf SignSection Is Nothing And ValidateSign(FocusedSign) = True Then
+            If SignNameTextBox.Text <> "New Sign" Then
                 FocusedSign.Text = SignNameTextBox.Text
                 SignConfig.AddSection(FocusedSign.Text)
-                SignConfig.GetSection(FocusedSign.Text).RemoveAllKeys()
-                SignConfig.GetSection(FocusedSign.Text).AddKey("CountKey").SetValue(CountKeyTextBox.Text)
-                SignConfig.GetSection(FocusedSign.Text).AddKey("CountHeader").SetValue(CountHeaderTextBox.Text)
-                SignConfig.GetSection(FocusedSign.Text).AddKey("ExportName").SetValue(ExportNameTextBox.Text)
-                SignConfig.GetSection(FocusedSign.Text).AddKey("DisplayMode").SetValue(DisplayModeDropBox.Text)
-                SignConfig.GetSection(FocusedSign.Text).AddKey("Diffs").SetValue(DiffsDropBox.Text)
+                SignSection = SignConfig.GetSection(FocusedSign.Text)
+                SignSection.AddKey("CountKey").SetValue(CountKeyTextBox.Text)
+                SignSection.AddKey("CountHeader").SetValue(CountHeaderTextBox.Text)
+                SignSection.AddKey("ExportName").SetValue(ExportNameTextBox.Text)
+                SignSection.AddKey("DisplayMode").SetValue(DisplayModeDropBox.Text)
+                SignSection.AddKey("Diffs").SetValue(DiffsDropBox.Text)
                 If IPSignRadio.Checked = True And COMSignRadio.Checked = False Then
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("ConnectionType").SetValue("1")
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("SignType").SetValue(SignTypeComboBox.Text)
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("IPAddress").SetValue(IPAddressTextBox.Text)
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("Port").SetValue(PortTextBox.Text)
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("Brightness").SetValue(BrightnessDropBox.Text)
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("Color").SetValue(ColorComboBox.Text)
+                    SignSection.AddKey("ConnectionType").SetValue("1")
+                    SignSection.AddKey("SignType").SetValue(SignTypeComboBox.Text)
+                    SignSection.AddKey("IPAddress").SetValue(IPAddressTextBox.Text)
+                    SignSection.AddKey("Port").SetValue(PortTextBox.Text)
+                    SignSection.AddKey("Brightness").SetValue(BrightnessDropBox.Text)
+                    SignSection.AddKey("Color").SetValue(ColorComboBox.Text)
                 ElseIf IPSignRadio.Checked = False And COMSignRadio.Checked = True Then
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("ConnectionType").SetValue("2")
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("ComPort").SetValue(COMPortDropBox.Text)
+                    SignSection.AddKey("ConnectionType").SetValue("2")
+                    SignSection.AddKey("ComPort").SetValue(COMPortDropBox.Text)
                 End If
-
-            ElseIf FocusedSign.Group.Tag <> 0 And ValidateSign(FocusedSign) = True Then
-                'SignNameTextBox.ForeColor = Color.Black
-                SignConfig.RenameSection(LoadedSignName, SignNameTextBox.Text)
-                FocusedSign.Text = SignNameTextBox.Text
-                If SignConfig.GetSection(FocusedSign.Text).Keys.Count > 0 Then
-                    SignConfig.GetSection(FocusedSign.Text).RemoveAllKeys()
-                End If
-                SignConfig.GetSection(FocusedSign.Text).AddKey("CountKey").SetValue(CountKeyTextBox.Text)
-                SignConfig.GetSection(FocusedSign.Text).AddKey("CountHeader").SetValue(CountHeaderTextBox.Text)
-                SignConfig.GetSection(FocusedSign.Text).AddKey("ExportName").SetValue(ExportNameTextBox.Text)
-                SignConfig.GetSection(FocusedSign.Text).AddKey("DisplayMode").SetValue(DisplayModeDropBox.Text)
-                SignConfig.GetSection(FocusedSign.Text).AddKey("Diffs").SetValue(DiffsDropBox.Text)
-                If IPSignRadio.Checked = True And COMSignRadio.Checked = False Then
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("ConnectionType").SetValue("1")
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("SignType").SetValue(SignTypeComboBox.Text)
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("IPAddress").SetValue(IPAddressTextBox.Text)
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("Port").SetValue(PortTextBox.Text)
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("Brightness").SetValue(BrightnessDropBox.Text)
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("Color").SetValue(ColorComboBox.Text)
-                ElseIf IPSignRadio.Checked = False And COMSignRadio.Checked = True Then
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("ConnectionType").SetValue("2")
-                    SignConfig.GetSection(FocusedSign.Text).AddKey("ComPort").SetValue(COMPortDropBox.Text)
-                End If
+            Else
+                MsgBox("You cannot use 'New Sign' as the name of your sign", MsgBoxStyle.Information, "Change the Sign Name")
             End If
+
+        Else
+            MsgBox("Select a communications type before saving", MsgBoxStyle.Information, "Sign Not Saved!")
         End If
     End Sub
 
@@ -447,7 +465,7 @@ Public Class Sign_Control
 
     Private Sub TimerThread()
         Dim Diffs As New IniFile
-
+        Dim SignCount As String
         Do
             'Me.pbRandom. 'CInt(Math.Ceiling(Rnd() * 100))
 
@@ -470,14 +488,12 @@ Public Class Sign_Control
                 For sign = 1 To i - 1
                     signvalue = sign
                     Try
-                        Me.Invoke(New MethodInvoker(Sub() Communications(signarray(signvalue))))
-                        'Dim signconfig As New IniFile
-                        'signconfig.Load("C:\test.ini")
-                        'Untested Line
+                        SignCount = UpdateCounts(signarray(signvalue))
+                        Me.Invoke(New MethodInvoker(Sub() Communications(signarray(signvalue), SignCount)))
                         Diffs.Load("C:\test.ini")
                         For Each key As IniFile.IniSection.IniKey In Diffs.GetSection(signarray(signvalue)).Keys
                             If key.Name = "ComPort" Then
-                                COMSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("ComPort").GetValue, UpdateCounts(signarray(signvalue)))
+                                COMSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("ComPort").GetValue, SignCount)
                             ElseIf key.Name = "IP Address" Then
 
                             End If
@@ -512,9 +528,9 @@ Public Class Sign_Control
         Me.Invoke(New EventHandler(AddressOf Me.CloseMe))
     End Sub
 
-    Public Sub Communications(sign As String)
-        Dim SignCount As New Integer
-        SignCount = UpdateCounts(sign)
+    Public Sub Communications(sign As String, SignCount As String)
+        'Dim SignCount As New Integer
+        'SignCount = UpdateCounts(sign)
         SignsListView.FindItemWithText(sign).SubItems(1).Text = SignCount
 
 
