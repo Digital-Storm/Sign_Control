@@ -366,9 +366,11 @@ Public Class Sign_Control
 
     End Sub
 
-    Private Sub IPSign_Send(IPAdd As String, port As Short, count As String, signtype As String)
+    Private Sub IPSign_Send(IPAdd As String, port As Short, count As String, signtype As String, Optional dimming As String = Nothing)
         'Dim sign As V15Network = Nothing
         Dim varbuffer As String = Nothing
+        Dim DimSet As DimmingType = DimmingType.DIMMING_AUTO
+        Dim DimLevel As Short = 0
         'Dim signerror As Object = Nothing
         If count.Length < 4 Then
             Select Case count.Length
@@ -382,24 +384,39 @@ Public Class Sign_Control
                     count = " " & count
             End Select
         End If
-        Select Case signtype
-            Case "DF-2053"
-                varbuffer = ((((((ChrW(12) & "010" & ChrW(2)) & "0101" & ChrW(27)) & DataTypes.SIGN_GREEN & ChrW(27)) & "M" & count) & ChrW(27) & "M") & ChrW(3) & ChrW(3))
-                Me.SignError = Me.SignNet.MdcSendMessage(1, "SIGNMSG", DateTime.Now, varbuffer)
-                Me.SignError = Me.SignNet.MdcRunMessage(0, "SIGNMSG", 0, True)
 
-            Case "Galaxy"
-
+        Select Case dimming
+            Case "Auto"
+                DimSet = DimmingType.DIMMING_AUTO
+                DimLevel = 0
+            Case "Maximum"
+                DimSet = DimmingType.DIMMING_MANUAL
+                DimLevel = &H3F
+            Case "Minimum"
+                DimSet = DimmingType.DIMMING_MANUAL
+                DimLevel = 1
+            Case Nothing
 
         End Select
 
+        Me.SignError = Me.SignNet.ConfigureRemote(IPAdd, port, &H3E8)
+        If Me.SignNet.bConnected = True Then
+            Me.SignNet.Disconnect()
+        End If
+        Me.SignError = Me.SignNet.Connect
+        Select Case signtype
+            Case "DF-2053"
+                Me.SignError = Me.SignNet.MdcSetDimming(1, DimSet, 0)
+                varbuffer = ((((((ChrW(12) & "010" & ChrW(2)) & "0101" & ChrW(27)) & DataTypes.SIGN_GREEN & ChrW(27)) & "M" & count) & ChrW(27) & "M") & ChrW(3) & ChrW(3))
+                Me.SignError = Me.SignNet.MdcSendMessage(1, "SIGNMSG", DateTime.Now, varbuffer)
+                Me.SignError = Me.SignNet.MdcRunMessage(1, "SIGNMSG", 0, True)
+            Case "Galaxy"
+                Me.SignError = Me.SignNet.M2SendRTD(1, 1, 4, True, count)
+        End Select
+        Me.SignError = Me.SignNet.Disconnect
         'varbuffer = ((((((ChrW(12) & "010" & ChrW(2)) & "0101" & ChrW(27)) & DataTypes.SIGN_GREEN & ChrW(27)) & "M" & count) & ChrW(27) & "M") & ChrW(3) & ChrW(3))
 
-        sign.ConfigureRemote(IPAdd, port, &H3E8)
-        sign.send()
-        sign.Connect()
-        sign.MdcSendMessage(0, count, DateTime.Now, varbuffer)
-
+        'sign.ConfigureRemote(IPAdd, port, &H3E8)
 
     End Sub
 
@@ -533,7 +550,11 @@ Public Class Sign_Control
                             If key.Name = "ComPort" Then
                                 COMSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("ComPort").GetValue, SignCount)
                             ElseIf key.Name = "IPAddress" Then
-                                IPSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("IP Address").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Port").GetValue, SignCount, Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue)
+                                If Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue = "DF-2053" Then
+                                    IPSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("IP Address").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Port").GetValue, SignCount, Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Brightness").GetValue)
+                                ElseIf Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue = "Galaxy" Then
+                                    IPSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("IP Address").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Port").GetValue, SignCount, Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue)
+                                End If
                             End If
                         Next
                     Catch ex As Exception
