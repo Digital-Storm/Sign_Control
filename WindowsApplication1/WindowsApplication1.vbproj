@@ -68,6 +68,10 @@
     <Reference Include="IniFileVbTest">
       <HintPath>..\..\..\..\..\Downloads\inifile_vb_cs_project\IniFile\IniFileVb\bin\Release\IniFileVbTest.dll</HintPath>
     </Reference>
+    <Reference Include="Interop.V15NetLib">
+      <HintPath>..\..\..\..\..\Desktop\DF-2053-V2.0.0.1\TSCSI DF-2053 Control_2_0_0_1\Interop.V15NetLib.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />

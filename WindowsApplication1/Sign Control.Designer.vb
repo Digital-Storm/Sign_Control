@@ -52,8 +52,6 @@ Partial Class Sign_Control
         Me.IPAddressGroup = New System.Windows.Forms.GroupBox()
         Me.SignTypeComboBox = New System.Windows.Forms.ComboBox()
         Me.SignTypeLabel = New System.Windows.Forms.Label()
-        Me.ColorLabel = New System.Windows.Forms.Label()
-        Me.ColorComboBox = New System.Windows.Forms.ComboBox()
         Me.IPAddressTextBox = New System.Windows.Forms.MaskedTextBox()
         Me.IPAddressLabel = New System.Windows.Forms.Label()
         Me.PortTextBox = New System.Windows.Forms.MaskedTextBox()
@@ -121,7 +119,7 @@ Partial Class Sign_Control
         'SignToolStripMenuItem
         '
         Me.SignToolStripMenuItem.Name = "SignToolStripMenuItem"
-        Me.SignToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.SignToolStripMenuItem.Size = New System.Drawing.Size(97, 22)
         Me.SignToolStripMenuItem.Text = "Si&gn"
         '
         'ToolStripSeparator1
@@ -146,7 +144,7 @@ Partial Class Sign_Control
         'OptionsToolStripMenuItem
         '
         Me.OptionsToolStripMenuItem.Name = "OptionsToolStripMenuItem"
-        Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(152, 22)
+        Me.OptionsToolStripMenuItem.Size = New System.Drawing.Size(116, 22)
         Me.OptionsToolStripMenuItem.Text = "Op&tions"
         '
         'SignsGroupBox
@@ -303,8 +301,6 @@ Partial Class Sign_Control
         '
         Me.IPAddressGroup.Controls.Add(Me.SignTypeComboBox)
         Me.IPAddressGroup.Controls.Add(Me.SignTypeLabel)
-        Me.IPAddressGroup.Controls.Add(Me.ColorLabel)
-        Me.IPAddressGroup.Controls.Add(Me.ColorComboBox)
         Me.IPAddressGroup.Controls.Add(Me.IPAddressTextBox)
         Me.IPAddressGroup.Controls.Add(Me.IPAddressLabel)
         Me.IPAddressGroup.Controls.Add(Me.PortTextBox)
@@ -335,24 +331,6 @@ Partial Class Sign_Control
         Me.SignTypeLabel.Size = New System.Drawing.Size(55, 13)
         Me.SignTypeLabel.TabIndex = 23
         Me.SignTypeLabel.Text = "Sign Type"
-        '
-        'ColorLabel
-        '
-        Me.ColorLabel.AutoSize = True
-        Me.ColorLabel.Location = New System.Drawing.Point(6, 129)
-        Me.ColorLabel.Name = "ColorLabel"
-        Me.ColorLabel.Size = New System.Drawing.Size(31, 13)
-        Me.ColorLabel.TabIndex = 21
-        Me.ColorLabel.Text = "Color"
-        '
-        'ColorComboBox
-        '
-        Me.ColorComboBox.FormattingEnabled = True
-        Me.ColorComboBox.Items.AddRange(New Object() {"Green", "Red"})
-        Me.ColorComboBox.Location = New System.Drawing.Point(87, 126)
-        Me.ColorComboBox.Name = "ColorComboBox"
-        Me.ColorComboBox.Size = New System.Drawing.Size(100, 21)
-        Me.ColorComboBox.TabIndex = 20
         '
         'IPAddressTextBox
         '
@@ -623,8 +601,6 @@ Partial Class Sign_Control
     Friend WithEvents PortTextBox As System.Windows.Forms.MaskedTextBox
     Friend WithEvents Button1 As System.Windows.Forms.Button
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
-    Friend WithEvents ColorLabel As System.Windows.Forms.Label
-    Friend WithEvents ColorComboBox As System.Windows.Forms.ComboBox
     Friend WithEvents SignTypeComboBox As System.Windows.Forms.ComboBox
     Friend WithEvents SignTypeLabel As System.Windows.Forms.Label
     Friend WithEvents Button2 As System.Windows.Forms.Button

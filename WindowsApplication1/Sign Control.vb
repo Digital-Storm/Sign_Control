@@ -5,7 +5,7 @@ Imports System.Drawing
 Imports System.IO.Ports
 Imports System.Windows.Forms
 Imports System.Threading
-'Imports V15NetLib
+Imports V15NetLib
 Imports System.ComponentModel
 
 
@@ -26,6 +26,8 @@ Public Class Sign_Control
     'On Startup
     '
 
+    Private SignError As V15NetError
+    Private SignNet As V15NetworkClass
 
     Private Sub Sign_Control_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Try
@@ -195,7 +197,7 @@ Public Class Sign_Control
                     IPAddressTextBox.Text = SignConfig.GetSection(FocusedSign.Text).GetKey("IPAddress").Value
                     PortTextBox.Text = SignConfig.GetSection(FocusedSign.Text).GetKey("Port").Value
                     BrightnessDropBox.Text = SignConfig.GetSection(FocusedSign.Text).GetKey("Brightness").Value
-                    ColorComboBox.Text = SignConfig.GetSection(FocusedSign.Text).GetKey("Color").Value
+                    SignTypeComboBox.Text = SignConfig.GetSection(FocusedSign.Text).GetKey("SignType").Value
                 Case 2
                     IPSignRadio.Checked = False
                     COMSignRadio.Checked = True
@@ -218,7 +220,7 @@ Public Class Sign_Control
             IPAddressTextBox.Clear()
             PortTextBox.Clear()
             BrightnessDropBox.Text = ""
-            ColorComboBox.Text = ""
+            SignTypeComboBox.Text = ""
             COMPortDropBox.Text = ""
             'SignConfig.GetSection(FocusedSign.Text).Name = FocusedSign.Text
         End If
@@ -249,7 +251,7 @@ Public Class Sign_Control
                         SignSection.AddKey("IPAddress").SetValue(IPAddressTextBox.Text)
                         SignSection.AddKey("Port").SetValue(PortTextBox.Text)
                         SignSection.AddKey("Brightness").SetValue(BrightnessDropBox.Text)
-                        SignSection.AddKey("Color").SetValue(ColorComboBox.Text)
+                        SignSection.AddKey("SignType").SetValue(SignTypeComboBox.Text)
                     ElseIf IPSignRadio.Checked = False And COMSignRadio.Checked = True Then
                         SignSection.AddKey("ConnectionType").SetValue("2")
                         SignSection.AddKey("ComPort").SetValue(COMPortDropBox.Text)
@@ -271,7 +273,7 @@ Public Class Sign_Control
                         SignSection.AddKey("IPAddress").SetValue(IPAddressTextBox.Text)
                         SignSection.AddKey("Port").SetValue(PortTextBox.Text)
                         SignSection.AddKey("Brightness").SetValue(BrightnessDropBox.Text)
-                        SignSection.AddKey("Color").SetValue(ColorComboBox.Text)
+                        SignSection.AddKey("SignType").SetValue(SignTypeComboBox.Text)
                     ElseIf IPSignRadio.Checked = False And COMSignRadio.Checked = True Then
                         SignSection.AddKey("ConnectionType").SetValue("2")
                         SignSection.AddKey("ComPort").SetValue(COMPortDropBox.Text)
@@ -293,7 +295,7 @@ Public Class Sign_Control
                     SignSection.AddKey("IPAddress").SetValue(IPAddressTextBox.Text)
                     SignSection.AddKey("Port").SetValue(PortTextBox.Text)
                     SignSection.AddKey("Brightness").SetValue(BrightnessDropBox.Text)
-                    SignSection.AddKey("Color").SetValue(ColorComboBox.Text)
+                    SignSection.AddKey("SignType").SetValue(SignTypeComboBox.Text)
                 ElseIf IPSignRadio.Checked = False And COMSignRadio.Checked = True Then
                     SignSection.AddKey("ConnectionType").SetValue("2")
                     SignSection.AddKey("ComPort").SetValue(COMPortDropBox.Text)
@@ -323,7 +325,7 @@ Public Class Sign_Control
         If IPSignRadio.Checked = False And COMSignRadio.Checked = False Then
             Return False
         ElseIf IPSignRadio.Checked = True Then
-            If SignNameTextBox.Text <> "" And CountHeaderTextBox.Text <> "" And CountKeyTextBox.Text <> "" And ExportNameTextBox.Text <> "" And DisplayModeDropBox.Text <> "" And DiffsDropBox.Text <> "" And SignTypeComboBox.Text <> "" And IPAddressTextBox.Text <> "" And PortTextBox.Text <> "" And BrightnessDropBox.Text <> "" And ColorComboBox.Text <> "" Then
+            If SignNameTextBox.Text <> "" And CountHeaderTextBox.Text <> "" And CountKeyTextBox.Text <> "" And ExportNameTextBox.Text <> "" And DisplayModeDropBox.Text <> "" And DiffsDropBox.Text <> "" And SignTypeComboBox.Text <> "" And IPAddressTextBox.Text <> "" And PortTextBox.Text <> "" And BrightnessDropBox.Text <> "" And SignTypeComboBox.Text <> "" Then
                 Return True
             Else
                 Return False
@@ -364,6 +366,42 @@ Public Class Sign_Control
 
     End Sub
 
+    Private Sub IPSign_Send(IPAdd As String, port As Short, count As String, signtype As String)
+        'Dim sign As V15Network = Nothing
+        Dim varbuffer As String = Nothing
+        'Dim signerror As Object = Nothing
+        If count.Length < 4 Then
+            Select Case count.Length
+                Case 0
+                    count = "    "
+                Case 1
+                    count = "   " & count
+                Case 2
+                    count = "  " & count
+                Case 3
+                    count = " " & count
+            End Select
+        End If
+        Select Case signtype
+            Case "DF-2053"
+                varbuffer = ((((((ChrW(12) & "010" & ChrW(2)) & "0101" & ChrW(27)) & DataTypes.SIGN_GREEN & ChrW(27)) & "M" & count) & ChrW(27) & "M") & ChrW(3) & ChrW(3))
+                Me.SignError = Me.SignNet.MdcSendMessage(1, "SIGNMSG", DateTime.Now, varbuffer)
+                Me.SignError = Me.SignNet.MdcRunMessage(0, "SIGNMSG", 0, True)
+
+            Case "Galaxy"
+
+
+        End Select
+
+        'varbuffer = ((((((ChrW(12) & "010" & ChrW(2)) & "0101" & ChrW(27)) & DataTypes.SIGN_GREEN & ChrW(27)) & "M" & count) & ChrW(27) & "M") & ChrW(3) & ChrW(3))
+
+        sign.ConfigureRemote(IPAdd, port, &H3E8)
+        sign.send()
+        sign.Connect()
+        sign.MdcSendMessage(0, count, DateTime.Now, varbuffer)
+
+
+    End Sub
 
     'Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
     Private Sub COMSign_Send(port As String, count As String)
@@ -494,8 +532,8 @@ Public Class Sign_Control
                         For Each key As IniFile.IniSection.IniKey In Diffs.GetSection(signarray(signvalue)).Keys
                             If key.Name = "ComPort" Then
                                 COMSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("ComPort").GetValue, SignCount)
-                            ElseIf key.Name = "IP Address" Then
-
+                            ElseIf key.Name = "IPAddress" Then
+                                IPSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("IP Address").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Port").GetValue, SignCount, Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue)
                             End If
                         Next
                     Catch ex As Exception
@@ -620,4 +658,5 @@ Public Class Sign_Control
             End If
         End If
     End Sub
+
 End Class
