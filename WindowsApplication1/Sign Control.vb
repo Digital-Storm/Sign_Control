@@ -7,7 +7,6 @@ Imports System.Windows.Forms
 Imports System.Threading
 Imports V15NetLib
 Imports System.ComponentModel
-Imports System.Runtime.InteropServices
 
 
 Public Class Sign_Control
@@ -17,31 +16,14 @@ Public Class Sign_Control
     Dim CommunicationsRunning As Boolean = False
     Dim randomProgress As Integer = 0
     Dim ThreadsRunning As Integer = 0
-    Dim SignConfig As New IniFile
     Dim shutdownattempt As Integer = 0
     Dim skipthisitem As Boolean = False
     Dim SelectedSignName As String = ""
     Dim LoadedSignName As String = ""
     Dim SaveSignNames As Boolean = True
-    'Dim SettingsConfig As New IniFile
-    'On Startup
-    '
+    Dim SignConfig As New IniFile
 
-    Private SignError As V15NetError
-    Private SignNet As V15NetworkClass
-    'Public Sub New()
-    '    'AddHandler MyBase.DoubleClick, New EventHandler(AddressOf Me.Sign_Control_DoubleClick)
-    '    AddHandler MyBase.DoubleClick, New EventHandler(AddressOf Me.Sign_Control_Load)
 
-    '    ' This call is required by the designer.
-    '    InitializeComponent()
-
-    '    ' Add any initialization after the InitializeComponent() call.
-
-    'End Sub
-
-    'Private Sub Sign_Control_DoubleClick(ByVal sender As Object, ByVal e As EventArgs)
-    'End Sub
     Private Sub Sign_Control_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.SignNet = New V15NetworkClass
         Try
@@ -55,10 +37,7 @@ Public Class Sign_Control
         End If
         'Dim varBuffer As String = ChrW(12)
         'varBuffer = ((((((varBuffer & "010" & ChrW(2)) & "0101" & ChrW(27)) & "C1C" & ChrW(27)) & "M" & "FULL") & ChrW(27) & "M") & ChrW(3) & ChrW(3))
-
         'Dim CurrentItem As ListViewItem
-
-
         SignConfig.Load("C:\test.ini")
         Dim i As Integer = 0
         Dim skipvalue As Integer = 0
@@ -81,7 +60,7 @@ Public Class Sign_Control
                 End If
                 'SignsListView.Items.Add(inisection.Name)
                 'For Each k As IniFile.IniSection.IniKey In inisection.Keys
-                '    If k.Name = "ConnectionType" Then
+                'If k.Name = "ConnectionType" Then
                 If skipthisitem = False Then
                     Select Case inisection.GetKey("ConnectionType").Value
                         Case 1
@@ -101,16 +80,11 @@ Public Class Sign_Control
             i = i + 1
             skipvalue = 0
         Next
-
-
-
         SignsListView.Update()
-
-
         For Each item As String In SerialPort.GetPortNames
             Me.COMPortDropBox.Items.Add(item)
         Next
-        Call UpdateListView()
+        'Call UpdateListView()
         Dim SignComms As Boolean = My.Settings.RunOnStartup
         If My.Settings.RunOnStartup = True Then
             Try
@@ -140,7 +114,6 @@ Public Class Sign_Control
         SignConfig.Save("C:\test.ini")
     End Sub
 
-
     'Opening Settings Panel
     Private Sub OptionsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OptionsToolStripMenuItem.Click
         Settings.Show()
@@ -148,7 +121,6 @@ Public Class Sign_Control
 
     'Closing the Program with Exit Button
     Private Sub ExitToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExitToolStripMenuItem.Click
-
         Settings.Close()
         Me.Close()
     End Sub
@@ -174,7 +146,6 @@ Public Class Sign_Control
         End If
     End Sub
 
-
     'Update UI when new object selected in Sign list
     Private Sub SignsListView_SelectedIndexChanged(sender As Object, e As EventArgs) Handles SignsListView.SelectedIndexChanged
         If SignsListView.SelectedIndices.Count >= 1 Then
@@ -184,15 +155,10 @@ Public Class Sign_Control
         Else
             SignConfigGroupBox.Hide()
         End If
-
-
     End Sub
-
 
     'Loads the sign settings into the UI when an item in the Sign Box is selected.
     Private Sub LoadSignSettings(FocusedSign As ListViewItem, Optional ByRef NewSign As Boolean = False)
-
-        'SignNameTextBox.ForeColor = Color.Black
         SignNameTextBox.Text = FocusedSign.Text
         SelectedSignName = FocusedSign.Text
         If Not NewSign = True And FocusedSign.Group.Tag <> 0 Then
@@ -219,7 +185,6 @@ Public Class Sign_Control
                     COMGroup.Show()
                     COMPortDropBox.Text = SignConfig.GetSection(FocusedSign.Text).GetKey("COMPort").Value
             End Select
-
         ElseIf NewSign = True Or FocusedSign.Group.Tag = 0 Then
             IPSignRadio.Checked = False
             COMSignRadio.Checked = False
@@ -236,18 +201,14 @@ Public Class Sign_Control
             BrightnessDropBox.Text = ""
             SignTypeComboBox.Text = ""
             COMPortDropBox.Text = ""
-            'SignConfig.GetSection(FocusedSign.Text).Name = FocusedSign.Text
         End If
         LoadedSignName = FocusedSign.Text
-
     End Sub
-
 
     'Clears the SignList setting and refills it with the current Sign list items and settings.
     Private Sub SignSaveSettings(FocusedSign As ListViewItem, Optional ByVal NewSign As Boolean = False)
         Dim SignSection As IniFile.IniSection
         SignSection = SignConfig.GetSection(FocusedSign.Text)
-
         If SignSection IsNot Nothing And ValidateSign(FocusedSign) = True Then
             Select Case FocusedSign.Group.Tag
                 Case 0
@@ -317,25 +278,20 @@ Public Class Sign_Control
             Else
                 MsgBox("You cannot use 'New Sign' as the name of your sign", MsgBoxStyle.Information, "Change the Sign Name")
             End If
-
         Else
             MsgBox("Select a communications type before saving", MsgBoxStyle.Information, "Sign Not Saved!")
         End If
     End Sub
 
-
     Function ValidateSign(FocusedSign As ListViewItem, Optional skipnamecheck As Boolean = False)
-
         If FocusedSign.Text <> SignNameTextBox.Text Then
             For Each section As IniFile.IniSection In SignConfig.Sections
                 If section.Name = SignNameTextBox.Text Then
-                    'SignNameTextBox.ForeColor = Color.Red
                     MsgBox("'" & SignNameTextBox.Text & "' is already in use. Please select a different name.")
                     Return False
                 End If
             Next
         End If
-
         If IPSignRadio.Checked = False And COMSignRadio.Checked = False Then
             Return False
         ElseIf IPSignRadio.Checked = True Then
@@ -355,11 +311,11 @@ Public Class Sign_Control
         End If
         Return False
     End Function
+
     'Saves the sign settings when the button is pressed.
     Private Sub SaveSignButton_Click(sender As Object, e As EventArgs) Handles SaveSignButton.Click
         Call Me.SignSaveSettings(SignsListView.FocusedItem)
     End Sub
-
 
     'Removes the sign from the list, and deletes its settings.
     Private Sub DeleteSignButton_Click(sender As Object, e As EventArgs) Handles DeleteSignButton.Click
@@ -374,19 +330,10 @@ Public Class Sign_Control
         End If
     End Sub
 
-
-    'Update sign list with current items
-    Private Sub UpdateListView()
-
-    End Sub
-
     Private Sub IPSign_Send(IPAdd As String, port As Short, count As String, signtype As String, Optional dimming As String = Nothing)
-        'Dim sign As V15Network = Nothing
         Dim varbuffer As String = Nothing
-        'Dim filetowriteto As String = "C:\NewFile.txt"
         Dim DimSet As DimmingType = DimmingType.DIMMING_AUTO
         Dim DimLevel As Short = 0
-        'Dim signerror As Object = Nothing
         If count.Length < 4 Then
             Select Case count.Length
                 Case 0
@@ -399,7 +346,6 @@ Public Class Sign_Control
                     count = " " & count
             End Select
         End If
-
         Select Case dimming
             Case "Auto"
                 DimSet = DimmingType.DIMMING_AUTO
@@ -411,12 +357,8 @@ Public Class Sign_Control
                 DimSet = DimmingType.DIMMING_MANUAL
                 DimLevel = 1
             Case Nothing
-
         End Select
         Me.SignError = Me.SignNet.ConfigureRemote(IPAdd, port, &H3E8)
-        If Me.SignNet.bConnected = True Then
-            Me.SignNet.Disconnect()
-        End If
         Me.SignError = Me.SignNet.Connect
         Select Case signtype
             Case "DF-2053"
@@ -424,18 +366,10 @@ Public Class Sign_Control
                 varbuffer = ((((((ChrW(12) & "010" & ChrW(2)) & "0101" & ChrW(27)) & DataTypes.SIGN_GREEN & ChrW(27)) & "M" & count) & ChrW(27) & "M") & ChrW(3) & ChrW(3))
                 Me.SignError = Me.SignNet.MdcSendMessage(1, "SIGNMSG", DateTime.Now, varbuffer)
                 Me.SignError = Me.SignNet.MdcRunMessage(1, "SIGNMSG", 0, True)
-                'Dim objWriter As New System.IO.StreamWriter(filetowriteto)
-                'objWriter.Write(Me.SignError.ToString)
-                'objWriter.Close()
-
             Case "Galaxy"
                 Me.SignError = Me.SignNet.M2SendRTD(1, 1, 4, True, count)
         End Select
         Me.SignError = Me.SignNet.Disconnect
-        'varbuffer = ((((((ChrW(12) & "010" & ChrW(2)) & "0101" & ChrW(27)) & DataTypes.SIGN_GREEN & ChrW(27)) & "M" & count) & ChrW(27) & "M") & ChrW(3) & ChrW(3))
-
-        'sign.ConfigureRemote(IPAdd, port, &H3E8)
-
     End Sub
 
     'Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
@@ -457,51 +391,48 @@ Public Class Sign_Control
         Dim bytearray2() As Byte = UnicodeStringToBytes(count)
         Dim bytearray3() As Byte = {2, 3}
 
+        Dim ByteArray(bytearray1.Length + bytearray2.Length + bytearray3.Length - 1) As Byte
+        Buffer.BlockCopy(bytearray1, 0, ByteArray, 0, bytearray1.Length)
+        Buffer.BlockCopy(bytearray2, 0, ByteArray, bytearray1.Length, bytearray2.Length)
+
+        Dim ByteArrayNew(ByteArray.Length + bytearray3.Length - 1) As Byte
+        Buffer.BlockCopy(ByteArray, 0, ByteArrayNew, 0, ByteArray.Length)
+        Buffer.BlockCopy(bytearray3, 0, ByteArrayNew, ByteArray.Length, bytearray3.Length)
+
         'Data Organization  
         '(16 16 02 03 00) Default with signs
         '(00) = No Checksum. (01) = Checksum Enabled
         '(XX XX XX XX) Sign Display Value, Leading 30's are auto removed
         '(00) Normal Operation (02) Sign OPEN (03) Sign FULL
+        Dim SignCom As IO.Ports.SerialPort
+        SignCom = New IO.Ports.SerialPort
+        SignCom = My.Computer.Ports.OpenSerialPort(port)
+        SignCom.BaudRate = 9600
+        SignCom.DataBits = 8
+        SignCom.Parity = IO.Ports.Parity.None
+        SignCom.Write(ByteArrayNew, 0, ByteArrayNew.Length)
+        SignCom.Close()
 
-        Using SignCOM As IO.Ports.SerialPort =
-            My.Computer.Ports.OpenSerialPort(port)
-            SignCOM.BaudRate = 9600
-            SignCOM.DataBits = 8
-            SignCOM.Parity = IO.Ports.Parity.None
-            SignCOM.Write(bytearray1, 0, bytearray1.Length)
-            SignCOM.Write(bytearray2, 0, bytearray2.Length)
-            SignCOM.Write(bytearray3, 0, bytearray3.Length)
-            SignCOM.Close()
-        End Using
+        'Using SignCOM As IO.Ports.SerialPort =
+        '    My.Computer.Ports.OpenSerialPort(port)
+        '    SignCOM.BaudRate = 9600
+        '    SignCOM.DataBits = 8
+        '    SignCOM.Parity = IO.Ports.Parity.None
+        '    SignCOM.Write(ByteArrayNew, 0, ByteArrayNew.Length)
+        '    SignCOM.Close()
+        'End Using
     End Sub
+    Private Function UnicodeBytesToString(
+    ByVal bytes() As Byte) As String
+
+        Return System.Text.Encoding.Unicode.GetString(bytes)
+    End Function
 
 
     'Convert string of numbers to bytes.
     Private Function UnicodeStringToBytes(ByVal str As String) As Byte()
         Return System.Text.Encoding.ASCII.GetBytes(str)
     End Function
-
-
-
-
-    ' Dimming Settings
-
-    'Public Sub DimmingAutoSign(SignIP As String)
-
-    '    Me.SignError = Me.SignNet.MdcSetDimming(SignIP, DimmingType.DIMMING_AUTO, 0)
-    '    'Me.lstDebug.Items.Insert(0, (Convert.ToString(DateAndTime.Now) & " [S1 Dimming->Auto]->" & DataTypes.GetV15Error(Me.SignError)))
-    'End Sub
-
-    'Public Sub DimmingMaximumSign(SignIP As String)
-    '    Me.SignError = Me.SignNet.MdcSetDimming(SignIP, DimmingType.DIMMING_MANUAL, &H3F)
-    '    'Me.lstDebug.Items.Insert(0, (Convert.ToString(DateAndTime.Now) & " [S1 Dimming->Maximum]->" & DataTypes.GetV15Error(Me.SignError)))
-    'End Sub
-
-    'Public Sub DimmingMinimumSign(SignIP As String)
-    '    Me.SignError = Me.SignNet.MdcSetDimming(SignIP, DimmingType.DIMMING_MANUAL, 1)
-    '    'Me.lstDebug.Items.Insert(0, (Convert.ToString(DateAndTime.Now) & " [S1 Dimming->Minimum]->" & DataTypes.GetV15Error(Me.SignError)))
-    'End Sub
-
 
     Public Function UpdateCounts(ByVal Sign As String) As String
         Dim strCount As String = ""
@@ -534,7 +465,6 @@ Public Class Sign_Control
         Return Strings.Right(Strings.Trim(Convert.ToString(strCount)), 4)
 
     End Function
-
 
     Private Sub TimerThread()
         Dim Diffs As New IniFile
@@ -578,19 +508,7 @@ Public Class Sign_Control
                     Catch ex As Exception
                     End Try
                 Next sign
-                'Next
-                'For Item = 0 To My.Settings.SignList.Count
-                '    If Not My.Settings.SignList.Item(Item).ToString.Contains("Subitem:") Then
 
-                '        If Sign = "Active" Then
-                '            Sign.SubItems(1).Text = UpdateCounts(Sign.Index)
-                '        End If
-
-                '        '    If Sign.SubItems(4).Text = "Active" Then
-                '        '        UpdateCounts(Sign.Index)
-                '        '        'SendCommunications(Sign.SubItems(12), )
-                '        '    End If
-                'Next
                 If Me.pbRandom.InvokeRequired Then
                     pbRandom.Invoke(New MethodInvoker(Sub() UpdateProgressBar()))
                 Else
@@ -605,41 +523,15 @@ Public Class Sign_Control
         Me.Invoke(New EventHandler(AddressOf Me.CloseMe))
     End Sub
 
+    'Updates ListViewItem with Sign Count (Invoked by thread)
     Public Sub Communications(sign As String, SignCount As String)
-        'Dim SignCount As New Integer
-        'SignCount = UpdateCounts(sign)
         SignsListView.FindItemWithText(sign).SubItems(1).Text = SignCount
-
-
-
-
-
-
-
-        'For Each item As ListViewItem In SignsListView.Items
-        '    If item.Text = sign Then
-        '        item.SubItems.Item(1).Text = UpdateCounts(sign)
-        '    End If
-
-        '    '    If Sign.SubItems(4).Text = "Active" Then
-        '    '        UpdateCounts(Sign.Index)
-        '    '        'SendCommunications(Sign.SubItems(12), )
-        '    '    End If
-        'Next
     End Sub
 
+    'Gives me visual indication that communications thread is active
     Private Sub UpdateProgressBar()
         pbRandom.Value = CInt(Math.Ceiling(Rnd() * 100))
     End Sub
-
-
-    Private Sub SendCommunications(ByVal sign As ListViewItem)
-        'If sign.SubItems() Then
-
-        'End If
-    End Sub
-
-
 
     'Update UI when COM radio button selected
     Private Sub COMSignRadio_CheckedChanged(sender As Object, e As EventArgs) Handles COMSignRadio.CheckedChanged
@@ -665,11 +557,6 @@ Public Class Sign_Control
         Me.ThreadsRunning -= 1
         Me.Close()
     End Sub
-
-    'Public Delegate Sub SetValue(value As Integer)
-    'Private SignError As V15NetError
-    'Private SignNet As V15NetworkClass
-    Private INIFile As IniFile
 
     Private Sub StartCommunicationsToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles StartCommunicationsToolStripMenuItem.Click
         If CommunicationsRunning = False Then
@@ -698,5 +585,8 @@ Public Class Sign_Control
         End If
     End Sub
 
+    Private INIFile As IniFile
+    Private SignError As V15NetError
+    Private SignNet As V15NetworkClass
 
 End Class

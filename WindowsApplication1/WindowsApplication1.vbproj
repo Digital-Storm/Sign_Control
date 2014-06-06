@@ -101,6 +101,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Signs.vb" />
     <Compile Include="DataTypes.vb" />
     <Compile Include="IniFileVb.vb" />
     <Compile Include="Settings.Designer.vb">
