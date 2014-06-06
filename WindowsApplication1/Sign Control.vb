@@ -7,6 +7,7 @@ Imports System.Windows.Forms
 Imports System.Threading
 Imports V15NetLib
 Imports System.ComponentModel
+Imports System.Runtime.InteropServices
 
 
 Public Class Sign_Control
@@ -28,8 +29,21 @@ Public Class Sign_Control
 
     Private SignError As V15NetError
     Private SignNet As V15NetworkClass
+    'Public Sub New()
+    '    'AddHandler MyBase.DoubleClick, New EventHandler(AddressOf Me.Sign_Control_DoubleClick)
+    '    AddHandler MyBase.DoubleClick, New EventHandler(AddressOf Me.Sign_Control_Load)
 
+    '    ' This call is required by the designer.
+    '    InitializeComponent()
+
+    '    ' Add any initialization after the InitializeComponent() call.
+
+    'End Sub
+
+    'Private Sub Sign_Control_DoubleClick(ByVal sender As Object, ByVal e As EventArgs)
+    'End Sub
     Private Sub Sign_Control_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Me.SignNet = New V15NetworkClass
         Try
             thrTimerThread.Start()
             ThreadsRunning += 1
@@ -65,25 +79,25 @@ Public Class Sign_Control
                 Else
                     skipthisitem = True
                 End If
-                    'SignsListView.Items.Add(inisection.Name)
-                    'For Each k As IniFile.IniSection.IniKey In inisection.Keys
-                    '    If k.Name = "ConnectionType" Then
-                    If skipthisitem = False Then
-                        Select Case inisection.GetKey("ConnectionType").Value
-                            Case 1
+                'SignsListView.Items.Add(inisection.Name)
+                'For Each k As IniFile.IniSection.IniKey In inisection.Keys
+                '    If k.Name = "ConnectionType" Then
+                If skipthisitem = False Then
+                    Select Case inisection.GetKey("ConnectionType").Value
+                        Case 1
                             SignsListView.Items.Add(inisection.Name).Group = SignsListView.Groups(1)
                             SignsListView.FindItemWithText(inisection.Name).SubItems.Add("")
                             SignsListView.FindItemWithText(inisection.Name).SubItems.Add("")
                             SignsListView.FindItemWithText(inisection.Name).SubItems.Add("")
-                            Case 2
+                        Case 2
                             SignsListView.Items.Add(inisection.Name).Group = SignsListView.Groups(2)
                             SignsListView.FindItemWithText(inisection.Name).SubItems.Add("")
                             SignsListView.FindItemWithText(inisection.Name).SubItems.Add("")
                             SignsListView.FindItemWithText(inisection.Name).SubItems.Add("")
-                        End Select
-                    End If
+                    End Select
                 End If
-                'Next
+            End If
+            'Next
             i = i + 1
             skipvalue = 0
         Next
@@ -369,6 +383,7 @@ Public Class Sign_Control
     Private Sub IPSign_Send(IPAdd As String, port As Short, count As String, signtype As String, Optional dimming As String = Nothing)
         'Dim sign As V15Network = Nothing
         Dim varbuffer As String = Nothing
+        'Dim filetowriteto As String = "C:\NewFile.txt"
         Dim DimSet As DimmingType = DimmingType.DIMMING_AUTO
         Dim DimLevel As Short = 0
         'Dim signerror As Object = Nothing
@@ -398,7 +413,6 @@ Public Class Sign_Control
             Case Nothing
 
         End Select
-
         Me.SignError = Me.SignNet.ConfigureRemote(IPAdd, port, &H3E8)
         If Me.SignNet.bConnected = True Then
             Me.SignNet.Disconnect()
@@ -410,6 +424,10 @@ Public Class Sign_Control
                 varbuffer = ((((((ChrW(12) & "010" & ChrW(2)) & "0101" & ChrW(27)) & DataTypes.SIGN_GREEN & ChrW(27)) & "M" & count) & ChrW(27) & "M") & ChrW(3) & ChrW(3))
                 Me.SignError = Me.SignNet.MdcSendMessage(1, "SIGNMSG", DateTime.Now, varbuffer)
                 Me.SignError = Me.SignNet.MdcRunMessage(1, "SIGNMSG", 0, True)
+                'Dim objWriter As New System.IO.StreamWriter(filetowriteto)
+                'objWriter.Write(Me.SignError.ToString)
+                'objWriter.Close()
+
             Case "Galaxy"
                 Me.SignError = Me.SignNet.M2SendRTD(1, 1, 4, True, count)
         End Select
@@ -551,9 +569,9 @@ Public Class Sign_Control
                                 COMSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("ComPort").GetValue, SignCount)
                             ElseIf key.Name = "IPAddress" Then
                                 If Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue = "DF-2053" Then
-                                    IPSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("IP Address").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Port").GetValue, SignCount, Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Brightness").GetValue)
+                                    IPSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("IPAddress").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Port").GetValue, SignCount, Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Brightness").GetValue)
                                 ElseIf Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue = "Galaxy" Then
-                                    IPSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("IP Address").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Port").GetValue, SignCount, Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue)
+                                    IPSign_Send(Diffs.GetSection(signarray(signvalue)).GetKey("IPAddress").GetValue, Diffs.GetSection(signarray(signvalue)).GetKey("Port").GetValue, SignCount, Diffs.GetSection(signarray(signvalue)).GetKey("SignType").GetValue)
                                 End If
                             End If
                         Next
@@ -679,5 +697,6 @@ Public Class Sign_Control
             End If
         End If
     End Sub
+
 
 End Class
