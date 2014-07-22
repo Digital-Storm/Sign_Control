@@ -22,9 +22,11 @@ Public Class Sign_Control
     Dim LoadedSignName As String = ""
     Dim SaveSignNames As Boolean = True
     Dim SignConfig As New IniFile
+    'Dim iSigns As New Signs.NewSign
 
 
     Private Sub Sign_Control_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
         Me.SignNet = New V15NetworkClass
         Try
             thrTimerThread.Start()
@@ -98,20 +100,20 @@ Public Class Sign_Control
 
     'On program shutdown.
     Private Sub Sign_Control_FormClosing(sender As Object, ByVal e As System.Windows.Forms.FormClosingEventArgs) Handles MyBase.FormClosing
-        CommunicationsRunning = False
-        'Dim intervalsetting As Integer = My.Settings.UpdateInterval
-        'My.Settings.UpdateInterval = 1
-        ProgramRunning = False
-        'temporary till i can force interupt of sleep on thread.
-        Threading.Thread.Sleep(My.Settings.UpdateInterval)
-        If ThreadsRunning >= 1 And shutdownattempt < 1 Then
-            shutdownattempt += 1
-            ' My.Settings.UpdateInterval = intervalsetting
-            If Not shutdownattempt > 1 Then
-                e.Cancel = True
+            CommunicationsRunning = False
+            'Dim intervalsetting As Integer = My.Settings.UpdateInterval
+            'My.Settings.UpdateInterval = 1
+            ProgramRunning = False
+            'temporary till i can force interupt of sleep on thread.
+            Threading.Thread.Sleep(My.Settings.UpdateInterval)
+            If ThreadsRunning >= 1 And shutdownattempt < 1 Then
+                shutdownattempt += 1
+                ' My.Settings.UpdateInterval = intervalsetting
+                If Not shutdownattempt > 1 Then
+                    e.Cancel = True
+                End If
             End If
-        End If
-        SignConfig.Save("C:\test.ini")
+            SignConfig.Save("C:\test.ini")
     End Sub
 
     'Opening Settings Panel

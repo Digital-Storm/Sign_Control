@@ -5,8 +5,9 @@ Public Class Settings
     Dim ConfigSave As Boolean = False
     Dim SettingsConfig As New IniFile
 
-    'On Settings load
+
     Private Sub Settings_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
 
         DiffsGroup.Hide()
 
